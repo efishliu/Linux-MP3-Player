@@ -1,0 +1,210 @@
+liugang@ubuntu:~/Desktop/课设软件/madplay移植软件$ tar -zxvf zlib-1.2.3.tar.gz -C /home/liugang/Desktop/madplay_src/
+
+liugang@ubuntu:~/Desktop/课设软件/madplay移植软件$ tar -zxvf libid3tag-0.15.1b.tar.gz -C /home/liugang/Desktop/madplay_src/
+
+liugang@ubuntu:~/Desktop/课设软件/madplay移植软件$ tar -zxvf libmad-0.15.1b.tar.gz -C /home/liugang/Desktop/madplay_src/
+
+liugang@ubuntu:~/Desktop/课设软件/madplay移植软件$ tar -zxvf madplay-0.15.2b.tar.gz -C /home/liugang/Desktop/madplay_src/
+
+
+liugang@ubuntu:~/Desktop/课设软件/madplay移植软件$ cd /home/liugang/Desktop/madplay_src/
+liugang@ubuntu:~/Desktop/madplay_src$ cd zlib-1.2.3/
+liugang@ubuntu:~/Desktop/madplay_src/zlib-1.2.3$ ./configure -shared --prefix=/home/liugang/Desktop/madplay_src/zlib-1.2.3/
+Checking for gcc...
+Checking for shared library support...
+Building shared library libz.so.1.2.3 with gcc.
+Checking for unistd.h... Yes.
+Checking whether to use vs[n]printf() or s[n]printf()... using vs[n]printf()
+Checking for vsnprintf() in stdio.h... Yes.
+Checking for return value of vsnprintf()... Yes.
+Checking for errno.h... Yes.
+Checking for mmap support... Yes.
+
+安装arm-linux-gcc
+liugang@ubuntu:~/Desktop/课设软件$ tar -zxvf arm-linux-gcc-4.3.2.tgz 
+liugang@ubuntu:~/Desktop/课设软件$ cd usr/local/
+liugang@ubuntu:~/Desktop/课设软件/usr/local$ sudo mv  arm /usr/local/
+
+
+
+liugang@ubuntu:/usr/local$ export PATH=/usr/local/arm/4.3.2/bin/:$PATH
+liugang@ubuntu:~/Desktop/madplay_src/zlib-1.2.3$ make
+arm-linux-gcc -fPIC -O3 -DUSE_MMAP   -c -o example.o example.c
+/usr/local/arm/4.3.2/bin//arm-linux-gcc: 行 3: /usr/local/arm/4.3.2/bin/arm-none-linux-gnueabi-gcc: 没有那个文件或目录
+<builtin>: recipe for target 'example.o' failed
+make: *** [example.o] Error 127
+liugang@ubuntu:~/Desktop/madplay_src/zlib-1.2.3$ export PATH=/usr/local/arm/4.3.2/bin:$PATH
+liugang@ubuntu:~/Desktop/madplay_src$ sudo arm-linux-gcc -v
+[sudo] liugang 的密码： 
+sudo: arm-linux-gcc：找不到命令
+
+说是出现这种问题的原因是由于Ubuntu16.04用的是64位的，按以前的解决方法就是使用命令：
+
+sudo apt-get install ia32-libs 装一些32位的库
+liugang@ubuntu:~/Desktop/madplay_src$ sudo apt-get install ia32-libs
+正在读取软件包列表... 完成
+正在分析软件包的依赖关系树       
+正在读取状态信息... 完成       
+没有可用的软件包 ia32-libs，但是它被其它的软件包引用了。
+这可能意味着这个缺失的软件包可能已被废弃，
+或者只能在其他发布源中找到
+然而下列软件包会取代它：
+  lib32ncurses5 lib32z1
+
+E: 软件包 ia32-libs 没有可安装候选
+
+出现上述界面是因为Ubuntu16.04版本已不支持ia32-libs的软件包，而是使用了lib32ncurses5、lib32z1软件包做为替代，所以在Ubuntu16.04版本当中应该安装执行：
+
+    sudo apt-get install lib32ncurses5 lib32z1
+
+liugang@ubuntu:~/Desktop/madplay_src/zlib-1.2.3$ make
+arm-linux-gcc -fPIC -O3 -DUSE_MMAP   -c -o example.o example.c
+arm-linux-gcc -fPIC -O3 -DUSE_MMAP   -c -o adler32.o adler32.c
+arm-linux-gcc -fPIC -O3 -DUSE_MMAP   -c -o compress.o compress.c
+arm-linux-gcc -fPIC -O3 -DUSE_MMAP   -c -o crc32.o crc32.c
+arm-linux-gcc -fPIC -O3 -DUSE_MMAP   -c -o gzio.o gzio.c
+arm-linux-gcc -fPIC -O3 -DUSE_MMAP   -c -o uncompr.o uncompr.c
+arm-linux-gcc -fPIC -O3 -DUSE_MMAP   -c -o deflate.o deflate.c
+arm-linux-gcc -fPIC -O3 -DUSE_MMAP   -c -o trees.o trees.c
+arm-linux-gcc -fPIC -O3 -DUSE_MMAP   -c -o zutil.o zutil.c
+arm-linux-gcc -fPIC -O3 -DUSE_MMAP   -c -o inflate.o inflate.c
+arm-linux-gcc -fPIC -O3 -DUSE_MMAP   -c -o infback.o infback.c
+arm-linux-gcc -fPIC -O3 -DUSE_MMAP   -c -o inftrees.o inftrees.c
+arm-linux-gcc -fPIC -O3 -DUSE_MMAP   -c -o inffast.o inffast.c
+arm-linux-gcc -shared -Wl,-soname,libz.so.1 -o libz.so.1.2.3 adler32.o compress.o crc32.o gzio.o uncompr.o deflate.o trees.o zutil.o inflate.o infback.o inftrees.o inffast.o
+rm -f libz.so libz.so.1
+ln -s libz.so.1.2.3 libz.so
+ln -s libz.so.1.2.3 libz.so.1
+arm-linux-gcc -fPIC -O3 -DUSE_MMAP -o example example.o -L. libz.so.1.2.3
+arm-linux-gcc -fPIC -O3 -DUSE_MMAP   -c -o minigzip.o minigzip.c
+arm-linux-gcc -fPIC -O3 -DUSE_MMAP -o minigzip minigzip.o -L. libz.so.1.2.3
+liugang@ubuntu:~/Desktop/madplay_src/zlib-1.2.3$ make install
+cp zlib.h zconf.h /home/liugang/Desktop/madplay_src/zlib-1.2.3//include
+chmod 644 /home/liugang/Desktop/madplay_src/zlib-1.2.3//include/zlib.h /home/liugang/Desktop/madplay_src/zlib-1.2.3//include/zconf.h
+cp libz.so.1.2.3 /home/liugang/Desktop/madplay_src/zlib-1.2.3//lib
+cd /home/liugang/Desktop/madplay_src/zlib-1.2.3//lib; chmod 755 libz.so.1.2.3
+cd /home/liugang/Desktop/madplay_src/zlib-1.2.3//lib; if test -f libz.so.1.2.3; then \
+  rm -f libz.so libz.so.1; \
+  ln -s libz.so.1.2.3 libz.so; \
+  ln -s libz.so.1.2.3 libz.so.1; \
+  (ldconfig || true)  >/dev/null 2>&1; \
+fi
+cp zlib.3 /home/liugang/Desktop/madplay_src/zlib-1.2.3//share/man/man3
+chmod 644 /home/liugang/Desktop/madplay_src/zlib-1.2.3//share/man/man3/zlib.3
+
+
+liugang@ubuntu:~/Desktop/madplay_src/libid3tag-0.15.1b$ ./configure --prefix=/home/liugang/Desktop/madplay_src/libid3tag-0.15.1b CC=arm-linux-gcc --host=arm-linux CPPFLAGS=-I/home/liugang/Desktop/madplay_src/zlib-1.2.3/include/LDFLAGS=-I/home/liugang/Desktop/madplay_src/zlib-1.2.3/lib/
+configure: creating ./config.status
+config.status: creating Makefile
+config.status: creating msvc++/Makefile
+config.status: creating libid3tag.list
+config.status: creating config.h
+config.status: executing depfiles commands
+
+
+liugang@ubuntu:~/Desktop/madplay_src/libid3tag-0.15.1b$ make
+arm-linux-ranlib .libs/libid3tag.a
+creating libid3tag.la
+(cd .libs && rm -f libid3tag.la && ln -s ../libid3tag.la libid3tag.la)
+make[2]: Leaving directory '/home/liugang/Desktop/madplay_src/libid3tag-0.15.1b'
+make[1]: Leaving directory '/home/liugang/Desktop/madplay_src/libid3tag-0.15.1b'
+
+liugang@ubuntu:~/Desktop/madplay_src/libid3tag-0.15.1b$ make install
+See any operating system documentation about shared libraries for
+more information, such as the ld(1) and ld.so(8) manual pages.
+----------------------------------------------------------------------
+mkdir -p -- . /home/liugang/Desktop/madplay_src/libid3tag-0.15.1b/include
+ /usr/bin/install -c -m 644 id3tag.h /home/liugang/Desktop/madplay_src/libid3tag-0.15.1b/include/id3tag.h
+make[3]: Leaving directory '/home/liugang/Desktop/madplay_src/libid3tag-0.15.1b'
+make[2]: Leaving directory '/home/liugang/Desktop/madplay_src/libid3tag-0.15.1b'
+make[1]: Leaving directory '/home/liugang/Desktop/madplay_src/libid3tag-0.15.1b'
+
+
+liugang@ubuntu:~/Desktop/madplay_src/libmad-0.15.1b$ ./configure --prefix=/home/liugang/Desktop/madplay_src/libmad-0.15.1b/ CC=arm-linux-gcc --host=arm-linux CPPFLAGS=-I/home/liugang/Desktop/madplay_src/libid3tag-0.15.1b/include/LDFLAGS=-I/home/liugang/Desktop/madplay_src/libid3tag-0.15.1b/lib/
+configure: creating ./config.status
+config.status: creating Makefile
+config.status: creating msvc++/Makefile
+config.status: creating libmad.list
+config.status: creating config.h
+config.status: executing depfiles commands
+
+
+liugang@ubuntu:~/Desktop/madplay_src/libmad-0.15.1b$ make
+cc1: error: unrecognized command line option "-fforce-mem"
+Makefile:383: recipe for target 'version.lo' failed
+make[2]: *** [version.lo] Error 1
+make[2]: Leaving directory '/home/liugang/Desktop/madplay_src/libmad-0.15.1b'
+Makefile:424: recipe for target 'all-recursive' failed
+make[1]: *** [all-recursive] Error 1
+make[1]: Leaving directory '/home/liugang/Desktop/madplay_src/libmad-0.15.1b'
+Makefile:249: recipe for target 'all' failed
+make: *** [all] Error 2
+
+liugang@ubuntu:~/Desktop/madplay_src/libmad-0.15.1b$ vim Makefile
+
+CFLAGS = -Wall -g -O -fforce-mem -fforce-addr -fthread-jumps -fcse-follow-jumps -fcse-skip-blocks -fexpensive-optimizations -fregmove -fschedule-insns2 -fstrength-reduce
+/make 错误时删除 MakeFile 当中的-fforce-mem
+liugang@ubuntu:~/Desktop/madplay_src/libmad-0.15.1b$ make
+arm-linux-ar cru .libs/libmad.a  version.o fixed.o bit.o timer.o stream.o frame.o synth.o decoder.o layer12.o layer3.o huffman.o imdct_l_arm.o
+arm-linux-ranlib .libs/libmad.a
+creating libmad.la
+(cd .libs && rm -f libmad.la && ln -s ../libmad.la libmad.la)
+make[2]: Leaving directory '/home/liugang/Desktop/madplay_src/libmad-0.15.1b'
+make[1]: Leaving directory '/home/liugang/Desktop/madplay_src/libmad-0.15.1b'
+
+./configure--prefix=/home/liugang/Desktop/madplay_src/madplay-0.15.2bCC=arm-linux-gcc--host=arm-linuxCPPFLAGS=-I/home/liugang/Desktop/madplay_src/libid3tag-0.15.1b/include/-I/home/liugang/Desktop/madplay_src/libmad-0.15.1b/include/LDFLAGS=-L/home/liugang/Desktop/madplay_src/zlib-1.2.3/lib/-L/home/liugang/Desktop/madplay_src/libid3tag-0.15.1b/lib/-L/home/liugang/Desktop/madplay_src/libmad-0.15.1b/lib
+
+3.6 编译 madplay 应用程序,该应用程序依赖于 zlib,libid3tag 和 libmad 库
+3.6.1 进入 madplay-0.15.2b 目录
+[root@localhost libmad-0.15.1b]# cd /usr/local/madplay-src/madplay-0.15.2b/
+3.6.2 执行 configure 脚本配置
+liugang@ubuntu:~/Desktop/madplay_src/madplay-0.15.2b$ ./configure --prefix=/home/liugang/Desktop/madplay_src/madplay-0.15.2b CC=arm-linux-gcc --host=arm-linux CPPFLAGS=-I/home/liugang/Desktop/madplay_src/libid3tag-0.15.1b/include/-I/home/liugang/Desktop/madplay_src/libmad-0.15.1b/include/ LDFLAGS=-L/home/liugang/Desktop/madplay_src/zlib-1.2.3/lib/-L/home/liugang/Desktop/madplay_src/libid3tag-0.15.1b/lib/-L/home/liugang/Desktop/madplay_src/libmad-0.15.1b/lib
+
+liugang@ubuntu:~/Desktop/madplay_src/madplay-0.15.2b$ make
+make[2]: Leaving directory '/home/liugang/Desktop/madplay_src/madplay-0.15.2b'
+make[1]: Leaving directory '/home/liugang/Desktop/madplay_src/madplay-0.15.2b'
+
+
+liugang@ubuntu:~/Desktop/madplay_src/madplay-0.15.2b$ make install
+ /usr/bin/install -c -m 644 ./abxtest.1 /home/liugang/Desktop/madplay_src/madplay-0.15.2b/man/man1/abxtest.1
+make[2]: Leaving directory '/home/liugang/Desktop/madplay_src/madplay-0.15.2b'
+make[1]: Leaving directory '/home/liugang/Desktop/madplay_src/madplay-0.15.2b'
+
+
+
+liugang@ubuntu:~/Desktop/madplay_src/madplay-0.15.2b$ arm-linux-readelf -d madplay|grep Shared
+ 0x00000001 (NEEDED)                     Shared library: [libmad.so.0]
+ 0x00000001 (NEEDED)                     Shared library: [libid3tag.so.0]
+ 0x00000001 (NEEDED)                     Shared library: [libm.so.6]
+ 0x00000001 (NEEDED)                     Shared library: [libc.so.6]
+
+
+3.7 移植 madplay 所需库文件到开发板
+madplay 要正常运行需要 libmad.so.0,libid3tag.so.0,libm.so.6 和 libc.so.6,其中 libm.so 和
+libc.so.6 在开发板的/lib 目录中存在,因此只需要将 lib-mad.so.3 和 libid3tag.so.0 移植到开发板即
+可 , 但 是 libmad.so.0 和 libid3tag.so.0 是 两 个 软 链 接 文 件 分 别 链 接 到 libmad.so.0.2.1 和
+libid3tag.so.0.3.0,可用下面命令查看:
+# ls -l /usr/local/madplay-src/libmad-0.15.1b/lib/libmad.so.0
+liugang@ubuntu:~/Desktop/madplay_src/madplay-0.15.2b$ ls -l /home/liugang/Desktop/madplay_src/libmad-0.15.1b/lib/libmad.so.0
+lrwxrwxrwx 1 liugang liugang 15 7月   4 02:38 /home/liugang/Desktop/madplay_src/libmad-0.15.1b/lib/libmad.so.0 -> libmad.so.0.2.1
+
+查看 libid3tag.so.0
+liugang@ubuntu:~/Desktop/madplay_src/madplay-0.15.2b$ ls -l /home/liugang/Desktop/madplay_src/libid3tag-0.15.1b/lib/libid3tag.so.0
+lrwxrwxrwx 1 liugang liugang 18 7月   4 01:09 /home/liugang/Desktop/madplay_src/libid3tag-0.15.1b/lib/libid3tag.so.0 -> libid3tag.so.0.3.0
+
+------------------------------------------
+3.8 编写一个 Makefile 文件,用 make 命令将第二节中设计的 mp3 播放器程序编译成可以在
+ARM 板上运行的程序,然后将该程序传到 ARM 板上,测试程序。
+makefile 文件目录：/home/liugang/Desktop/musiccode/Makefile
+
+
+
+
+
+
+
+
+
+
+
+

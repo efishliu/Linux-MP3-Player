@@ -1,0 +1,7 @@
+<RCC>
+    <qresource prefix="/">
+        <file>music.qss</file>
+        <file>music2.qss</file>
+        <file>b1.jpg</file>
+    </qresource>
+</RCC>
